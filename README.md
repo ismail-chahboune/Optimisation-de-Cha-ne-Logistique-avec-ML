@@ -1,60 +1,42 @@
+# Store Item Demand Forecasting & Inventory Optimization
 
----
+End-to-end project that forecasts daily sales for each store and item, then turns the forecasts into recommended inventory levels for a target service level.
 
-# Store Item Forecasting & Inventory Optimization
+## Dataset
+Store Item Demand Forecasting data (Kaggle): 913,000 rows, 10 stores × 50 items (500 series), daily sales from 2013-01-01 to 2017-12-31. Forecast horizon: 90 days (2018-01-01 to 2018-03-31).
 
-##  Description du Projet
+## Approach
+1. Features: calendar variables (year, month, day, weekday) and lagged sales (1, 7, 30 days)
+2. Model: ExtraTreesRegressor
+3. Forecasting: recursive day-by-day, so lags are always correct over the 90-day horizon
+4. Validation: time-based. Train until 2017-10-02, forecast the last 90 days, compare with a baseline (average of the same weekday over the last 8 weeks)
+5. Inventory policy: lead-time demand (7 days) + safety stock for a 95% service level, based on the measured error of the lead-time forecast
+6. Costs: holding cost (0.5 per unit per day) and stockout cost (2.0 per unit), set as assumptions
 
-Ce projet effectue la **prévision des ventes quotidiennes** pour différents magasins et articles, et propose des **recommandations de stock optimisé**.
-Il combine un modèle de machine learning (**ExtraTreesRegressor**) avec des méthodes de gestion des stocks pour minimiser les coûts tout en respectant un niveau de service désiré.
+## Results (validation, 90-day recursive forecast)
 
----
+| Metric | Model | Baseline |
+|---|---|---|
+| RMSE | 9.38 | 15.59 |
+| MAE | 7.28 | 11.66 |
+| SMAPE | 15.59% | - |
 
-##  Objectifs du Projet
+The model reduces RMSE by **39.8%** compared with the baseline.
 
-* Préparer et enrichir les données avec des variables temporelles et des lags de ventes
-* Prédire les ventes futures pour chaque magasin et article
-* Calculer le stock de sécurité et le niveau de stock recommandé
-* Estimer les coûts de stockage et de rupture de stock
-* Générer des fichiers de sortie opérationnels pour la planification des stocks
+| Inventory policy | Service level | Avg. stockout cost | Avg. total cost |
+|---|---|---|---|
+| Forecast only | 63.9% | 27.43 | 37.24 |
+| Forecast + safety stock | 97.0% | 0.93 | 35.80 |
 
----
+Adding safety stock raises the service level from 63.9% to 97.0% and cuts stockout costs by about 97%, with a slight reduction in total cost.
 
-##  Approche
+## Limitations
+- Holding cost, stockout cost, and lead time are assumptions, not real business data.
+- The policy check uses the same validation period that was used to measure the forecast error, so the service level is an estimate, not an out-of-sample guarantee.
 
-1. Chargement et exploration des données (`train.csv`, `test.csv`, `sample_submission.csv`)
-2. Prétraitement : conversion des dates, création des colonnes year/month/day/weekday
-3. Création de features de lag (1, 7 et 30 jours) pour capturer la tendance passée
-4. Modélisation des ventes avec **ExtraTreesRegressor**
-5. Évaluation du modèle sur un jeu de validation (RMSE, MAE)
-6. Génération de recommandations de stock :
+## Files
+- `store_item_forecast_and_inventory_opt.py`: full pipeline
+- `inventory_plan.csv`: forecasts and recommended inventory per store, item, and date
 
-   * Calcul du stock de sécurité basé sur l’erreur de prédiction et le niveau de service
-   * Calcul du stock recommandé et estimation des coûts associés
-7. Sauvegarde des résultats dans `submission.csv`, `inventory_plan.csv`, et `submission_optimized.csv`
-
----
-
-##  Résultats
-
-* Prévision des ventes pour chaque magasin et article
-* Calcul du stock recommandé avec prise en compte des risques de rupture et coûts de stockage
-* Fichiers prêts pour l’intégration dans un plan opérationnel
-
----
-
-##  Fichiers Principaux
-
-* `store_item_forecast_and_inventory_opt.py` — Script complet de traitement, prévision et optimisation des stocks
-* `train.csv`, `test.csv`, `sample_submission.csv` — Datasets utilisés
-* `submission.csv`, `inventory_plan.csv`, `submission_optimized.csv` — Fichiers générés
-* `README.md` — Documentation
-
----
-
-##  Auteur
-
-Projet réalisé par **Chahboune Ismail**
-
----
-
+## Author
+Ismail Chahboune

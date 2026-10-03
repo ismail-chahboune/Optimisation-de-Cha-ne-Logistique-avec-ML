@@ -30,6 +30,8 @@ The model reduces RMSE by **39.8%** compared with the baseline.
 
 Adding safety stock raises the service level from 63.9% to 97.0% and cuts stockout costs by about 97%, with a slight reduction in total cost.
 
+   ![Forecast example](forecast_example.png)
+
 ## Limitations
 - Holding cost, stockout cost, and lead time are assumptions, not real business data.
 - The policy check uses the same validation period that was used to measure the forecast error, so the service level is an estimate, not an out-of-sample guarantee.

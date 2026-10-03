@@ -164,7 +164,7 @@ print("Preparing submission files...")
 submission = sample.copy()
 submission["label"] = test_preds[:40000]  
 submission.to_csv("submission.csv", index=False)
-print("✅ Submission saved as submission.csv")
+print(" Submission saved as submission.csv")
 
 
 inv_cols = ['id','store','item','date','predicted_sales','safety_stock','recommended_inventory','expected_holding_cost','expected_stockout_cost','total_expected_cost']
